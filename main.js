@@ -39,7 +39,7 @@ const newbutton = (buttondata) => {
     type: 1,
   };
 };
-const prefix = "gb!"
+const prefix = ".gb"
 const admin_list = ["861112893134340106"];
 const command_list = ["test"]
 const json = require("./command.json")
@@ -48,7 +48,7 @@ process.env.TZ = 'Asia/Tokyo'
 
 async function create_data(option, id) {
   if(option == "player"){
-    await player_status.set(id, [false,40,10,20,1500,0,0,0,0]);
+    await player_status.set(id, [false]);
   }
 }
 
@@ -82,24 +82,28 @@ client.on("messageCreate", async message => {
   const arg = message.content.slice(prefix.length).split(/ +/);
   const command = arg.shift().toLowerCase();
   
+  if(message.author.id != "861112893134340106" && command){
+    return message.reply("# 現在は管理者しか使えないよ！");
+  }
+  
   if(command_list.includes(command)){
     const p_status = await player_status.get(message.author.id);
     if (!p_status) {
-      await create_data("player", message.author.id);
-      const e = new MessageEmbed()
-      .setTitle("ようこそGODFIELDへ!\nプレイヤーデータを登録したよ!\n再度コマンドを入力してね!")
-      .addField("BOTの招待:",">>> **[GODFIELDの招待](https://discord.com/api/oauth2/authorize?client_id=1135584196077813834&permissions=8&scope=bot)**")
-      .addField("リンク関連",">>> **[公式鯖](https://discord.gg/qZ2tAVH8Nt)**")
-      .setThumbnail("https://media.discordapp.net/attachments/1135596412227301408/1135596519173652570/unnamed.webp")
-      return message.member.send({embeds: [e]});
+      await create_data("player", message.author.id)
+      return message.channel.send("プレイヤーデータを登録しました。");
     }
   }
   
-  
   if(command == "test"){
-    message.reply("ok")
+    const cm = require('./cmds/test.js');
+    cm.execute(message,message.author.id);
   }
-
+  
+  if(command == "deletedata"){
+    await delete_data("player", message.author.id);
+    message.reply("データを削除しました。")
+  }
+  
 });
 
 client.login(process.env.TOKEN)
