@@ -41,7 +41,7 @@ const newbutton = (buttondata) => {
 };
 const prefix = ".gb"
 const admin_list = ["861112893134340106"];
-const command_list = ["test"]
+const command_list = ["test","deletedata"]
 const json = require("./command.json")
 process.env.TZ = 'Asia/Tokyo'
 'use strict';
