@@ -7,18 +7,51 @@ async function splice_status(player_id, start, deleteCount, item1) {
   status.splice(start, deleteCount, item1);
   await player_status.set(player_id, status);
 }
+const prefix = ".gb"
 module.exports = {
   name: 'test',
   description: 'test message',
   async execute(message,id) {
-    const embed = new MessageEmbed()
-      .setTitle('Loading...')
-      .setImage('https://media.discordapp.net/attachments/1154331528520806400/1154332794374332446/lv_0_20230921172617.gif')
-      .setColor('#0000ff');
-    const sentEmbed = await message.channel.send({ embeds: [embed] });
-    setTimeout(() => {
-      sentEmbed.delete()
-      message.reply('ok');
-    }, 3000);
+    let times = [];
+    const args = message.content.slice(prefix.length + 'test'.length).trim().split(/ +/);
+    if (args == "fast") {
+      const ran = Math.floor(Math.random() * (30 - 10+ 1)) + 10;
+      times.push(ran)
+    }else if(args == "low"){
+      const ran = Math.floor(Math.random() * (120 - 20 + 1)) + 20;
+      times.push(ran)
+    }else{
+      const ran = Math.floor(Math.random() * (60 - 10 + 1)) + 10;
+      times.push(ran)
+    }
+    
+    const tn = Math.floor(times / 10) * 10;
+    const totalTime = times;
+    let currentTime = 0;
+    const progressBarEmbed = new MessageEmbed()
+      .setColor('#000000')
+      .setTitle('テストを実行中です')
+      .setDescription('テスト中です...')
+      .setFooter(`約${tn}秒で完了します`);
+
+    const progressBarMessage = await message.channel.send({ embeds: [progressBarEmbed] });
+    
+    const barLength = 20;
+    
+    const progressBarInterval = setInterval(() => {
+      currentTime++;
+      const progress = (currentTime / totalTime);
+      const progressBar = '='.repeat(Math.floor(barLength * progress)) + ' '.repeat(barLength - Math.floor(barLength * progress));
+
+      progressBarEmbed.setDescription(`\`\`\`[${progressBar}] ${Math.floor(progress * 100)}%\`\`\``);
+
+      progressBarMessage.edit({ embeds: [progressBarEmbed] });
+
+      if (currentTime >= totalTime) {
+        clearInterval(progressBarInterval);
+        progressBarEmbed.setDescription('```diff\n+ このbotは正常です。```');
+        progressBarMessage.edit({ embeds: [progressBarEmbed] });
+      }
+    }, 1000);
   },
 };
