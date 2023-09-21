@@ -41,7 +41,7 @@ const newbutton = (buttondata) => {
 };
 const prefix = ".gb"
 const admin_list = ["861112893134340106"];
-const command_list = ["test","deletedata"]
+const command_list = ["test"]
 const json = require("./command.json")
 process.env.TZ = 'Asia/Tokyo'
 'use strict';
@@ -81,12 +81,11 @@ client.on('ready', async () => {
 client.on("messageCreate", async message => {
   const arg = message.content.slice(prefix.length).split(/ +/);
   const command = arg.shift().toLowerCase();
-  
-  if(message.author.id != "861112893134340106" && command){
-    return message.reply("# 現在は管理者しか使えないよ！");
-  }
-  
+
   if(command_list.includes(command)){
+    if(message.author.id != "861112893134340106"){
+      return message.reply("# 現在は管理者しか使えないよ！");
+    }
     const p_status = await player_status.get(message.author.id);
     if (!p_status) {
       await create_data("player", message.author.id)
